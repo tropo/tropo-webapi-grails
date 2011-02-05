@@ -276,6 +276,16 @@ class TropoBuilderTests extends GroovyTestCase {
 		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"1234\"}]}]}"
 	}
 	
+	public void testSayWithNumbersAndDobleQuotes() {
+	
+		def builder = new TropoBuilder()
+		
+		builder.tropo {
+			say("Your zipcode is ${14000}. oh yes.")
+		}
+		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Your zipcode is 14000. oh yes.\"}]}]}"
+	}
+	
 	public void testSayWithMapArgument() {
 		
 		def builder = new TropoBuilder()
