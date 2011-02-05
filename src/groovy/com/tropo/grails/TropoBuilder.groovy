@@ -1,6 +1,8 @@
 package com.tropo.grails
 
 import grails.util.GrailsWebUtil;
+import groovy.lang.GString;
+
 import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
 
@@ -86,6 +88,7 @@ class TropoBuilder extends BuilderSupport {
 
 			}
 		} else {
+			map = cleanGStrings(map)
 			def newNode = new JSONObject()
 			newNode.putAll more
 			validate(name,newNode)
@@ -131,6 +134,7 @@ class TropoBuilder extends BuilderSupport {
 	private JSONObject buildElement(String name, Map map) {
 		
 		//println "I would now insert node ${name} in stack element ${stack.peek()}"
+		map = cleanGStrings(map)
 		def node = stack.peek()
 		
 		def element = new JSONObject()
@@ -167,6 +171,7 @@ class TropoBuilder extends BuilderSupport {
 	
 	private JSONObject buildArray(String name, Map map) {
 		
+		map = cleanGStrings(map)
 		//println "I would now insert node ${name} in stack element ${stack.peek()}"
 		def node = stack.peek()
 		def created
@@ -272,6 +277,7 @@ class TropoBuilder extends BuilderSupport {
 	protected Object createNode(Object name, Object value) {
 
 		//println "Invoking createNode(object arg0, object arg1) with args ${name} and ${value}. Current: ${getCurrent()}"
+		value = cleanGStrings(value)
 		
 		if (name == "say") {
 			if (!(value instanceof String) && !(value instanceof Map) && !(value instanceof List)) {
@@ -370,4 +376,26 @@ class TropoBuilder extends BuilderSupport {
 		root.put("tropo",[])
 		stack.push root.tropo
 	}
+	
+	private Object cleanGStrings(Object value) {
+		
+		if (value instanceof GString) {
+			return value as String
+		} else if (value instanceof Map) {
+			value.each {
+				if (it.value instanceof GString) {
+					it.value = it.value as String
+				}
+			}
+		} else if (value instanceof List) {
+			value.each {
+				if (it instanceof String) {
+					it = it as String
+				}
+			}
+		}
+		return value
+	}
+	
+
 }
