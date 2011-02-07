@@ -114,7 +114,7 @@ class TropoBuilder extends BuilderSupport {
 			if (name == "say") {				
 				created = buildArray(name,map)
 			} else if (name == "on") {
-				// it looks like on uses an array only if nested
+				// it looks like "on" uses an array only if nested
 				if (stack.peek() == root.tropo) {
 					created = buildElement(name,map)
 				} else {
@@ -146,6 +146,8 @@ class TropoBuilder extends BuilderSupport {
 		element.put(name, new JSONObject())
 		
 		if (name == "choices") {
+			// There is an issue with JSON-LIB. When an element starts with { or [ then json-lib handles it
+			// as JSON creating wrong text. Ej. "[5 DIGITS]" is transformed to ["5 DIGITS"]
 			map.each {
 				if (it.value.startsWith("[") || it.value.startsWith("{")) {
 					it.value = " " + it.value
