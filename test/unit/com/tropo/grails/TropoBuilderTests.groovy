@@ -33,12 +33,12 @@ class TropoBuilderTests extends GroovyTestCase {
 		def builder = new TropoBuilder()
 		builder.tropo {
 			ask(name : 'foo', bargein: true, timeout: 30, required: true) {
-				say('Please say your account number')
-				on(event:'success',next:'/result.json')
+				say('Please say your account number')				
 				choices(value: '[5 DIGITS]')
 			}
+			on(event:'success',next:'/result.json')
 		}
-		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"on\":[{\"event\":\"success\",\"next\":\"/result.json\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"on\":{\"event\":\"success\",\"next\":\"/result.json\"}}]}"
 	}  
 		
 	public void testFailsAskWithNoNameParameter() {
