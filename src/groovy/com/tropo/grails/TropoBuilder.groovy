@@ -368,7 +368,7 @@ class TropoBuilder extends BuilderSupport {
 	
 	public String toString() {
 
-		return json
+		return text()
 	}
 	
 	public void reset() {
