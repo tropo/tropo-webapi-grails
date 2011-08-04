@@ -303,6 +303,11 @@ class TropoBuilder extends BuilderSupport {
 				def map = ["value":value]
 				createNode(name,map)
 			}
+		} else if (name == "append") {
+			JSONObject tropo = value.root['tropo']
+			tropo.entrySet().each {
+				createNode(it.key, it.value)
+			}
 		}
 		return null;
 	}
