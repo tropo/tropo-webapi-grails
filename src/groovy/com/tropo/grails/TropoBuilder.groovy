@@ -384,6 +384,12 @@ class TropoBuilder extends BuilderSupport {
 		stack.push root.tropo
 	}
 	
+	def isEmpty() {
+						
+		def node = root?.get("tropo")
+		node == null || node.size() == 0
+	}
+	
 	private Object cleanGStrings(Object value) {
 		
 		if (value instanceof GString) {

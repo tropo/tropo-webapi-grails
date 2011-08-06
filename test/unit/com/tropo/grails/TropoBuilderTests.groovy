@@ -721,4 +721,21 @@ class TropoBuilderTests extends GroovyTestCase {
 		}
 		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"on\":{\"event\":\"success\",\"next\":\"/result.json\"}}]}"
 	}
+	
+	public void testIsEmpty() {
+		
+		def builder = new TropoBuilder()
+		assertTrue builder.isEmpty()
+		
+		builder.tropo {}
+		assertTrue builder.isEmpty()
+		
+		builder.tropo {
+			say('hello')
+		}
+		assertFalse builder.isEmpty()
+		
+		builder.reset()
+		assertTrue builder.isEmpty()
+	}
 }
