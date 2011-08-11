@@ -304,9 +304,14 @@ class TropoBuilder extends BuilderSupport {
 				createNode(name,map)
 			}
 		} else if (name == "append") {
-			JSONObject tropo = value.root['tropo']
-			tropo.entrySet().each {
-				createNode(it.key, it.value)
+			def builder = value.root['tropo']
+			def rootArray = root['tropo']
+			if (builder instanceof JSONObject) {
+				rootArray.add(builder)
+			} else if (builder instanceof JSONArray) {
+				builder.each {
+					rootArray.add(it)
+				}
 			}
 		}
 		return null;

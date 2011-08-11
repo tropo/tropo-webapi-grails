@@ -686,24 +686,6 @@ class TropoBuilderTests extends GroovyTestCase {
 		assert map.session.userType == 'HUMAN'
 	}
 	
-	
-	public void testAppendTropo() {
-		
-		def builder1 = new TropoBuilder()
-		builder1.tropo {
-			say('Please say your account number')
-		}
-		
-		def builder2 = new TropoBuilder()
-		builder2.tropo {
-			ask(name : 'foo', bargein: true, timeout: 30, required: true, choices: '[5 DIGITS]') {
-				append(builder1)
-			}
-		}
-	
-		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"choices\":[\"5 DIGITS\"],\"say\":[{\"value\":\"Please say your account number\"}]}}]}"
-	}
-	
 	public void testAppendOnBlock() {
 		
 		def builder1 = new TropoBuilder() 
@@ -720,6 +702,25 @@ class TropoBuilderTests extends GroovyTestCase {
 			append(builder1)
 		}
 		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"on\":{\"event\":\"success\",\"next\":\"/result.json\"}}]}"
+	}
+	
+	public void testAppendBlockWithMultipleElements() {
+		
+		def builder1 = new TropoBuilder()
+		builder1.tropo {
+			say('Hello tropo')
+			hangup()
+		}
+		
+		def builder2 = new TropoBuilder()
+		builder2.tropo {
+			ask(name : 'foo', bargein: true, timeout: 30, required: true) {
+				say('Please say your account number')
+				choices(value: '[5 DIGITS]')
+			}
+			append(builder1)
+		}
+		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null}]}"
 	}
 	
 	public void testIsEmpty() {
