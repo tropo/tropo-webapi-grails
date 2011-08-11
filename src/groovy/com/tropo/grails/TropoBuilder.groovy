@@ -313,6 +313,7 @@ class TropoBuilder extends BuilderSupport {
 					rootArray.add(it)
 				}
 			}
+			stack.push root.tropo
 		}
 		return null;
 	}

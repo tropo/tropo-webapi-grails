@@ -723,6 +723,47 @@ class TropoBuilderTests extends GroovyTestCase {
 		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null}]}"
 	}
 	
+	public void testAppendBlockStart() {
+		
+		def builder1 = new TropoBuilder()
+		builder1.tropo {
+			say('Hello tropo')
+			hangup()
+		}
+		
+		def builder2 = new TropoBuilder()
+		builder2.tropo {
+			append(builder1)
+			ask(name : 'foo', bargein: true, timeout: 30, required: true) {
+				say('Please say your account number')
+				choices(value: '[5 DIGITS]')
+			}
+		}
+		assert builder2.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null},{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+	}
+	
+	
+	public void testAppendBlockMiddle() {
+		
+		def builder1 = new TropoBuilder()
+		builder1.tropo {
+			say('Hello tropo')
+			hangup()
+		}
+		
+		def builder2 = new TropoBuilder()
+		builder2.tropo {
+			say('Whatsup')
+			append(builder1)
+			ask(name : 'foo', bargein: true, timeout: 30, required: true) {
+				say('Please say your account number')
+				choices(value: '[5 DIGITS]')
+			}
+		}
+		println builder2.text()
+		assert builder2.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Whatsup\"}]},{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null},{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+	}
+	
 	public void testIsEmpty() {
 		
 		def builder = new TropoBuilder()
