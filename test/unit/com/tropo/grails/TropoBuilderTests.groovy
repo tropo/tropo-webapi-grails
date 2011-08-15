@@ -13,7 +13,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			ask(name : 'foo', bargein: true, timeout: 30, required: true)
 		}
-		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true}}]}"
+		assert builder.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true}}]}"""
 	}
 	
 	public void testAskWithSayBlock() {
@@ -24,7 +24,7 @@ class TropoBuilderTests extends GroovyTestCase {
 				say('Please say your account number')
 			}
 		}
-		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"choices\":[\"5 DIGITS\"],\"say\":[{\"value\":\"Please say your account number\"}]}}]}"
+		assert builder.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"choices":["5 DIGITS"],"say":[{"value":"Please say your account number"}]}}]}"""
 
 	}
 	
@@ -38,7 +38,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			}
 			on(event:'success',next:'/result.json')
 		}
-		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"on\":{\"event\":\"success\",\"next\":\"/result.json\"}}]}"
+		assert builder.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}},{"on":{"event":"success","next":"/result.json"}}]}"""
 	}  
 		
 	public void testFailsAskWithNoNameParameter() {
@@ -58,7 +58,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			choices(value: '[5 DIGITS]')
 		}
-		assert builder.text() == "{\"tropo\":[{\"choices\":{\"value\":\"[5 DIGITS]\"}}]}"
+		assert builder.text() == """{"tropo":[{"choices":{"value":"[5 DIGITS]"}}]}"""
 	}
 	
 	public void testFailsChoicesWithUnsupportedMode() {
@@ -78,7 +78,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			choices(value: '[5 DIGITS]', mode: 'dtmf')
 		}
-		assert builder.text() == "{\"tropo\":[{\"choices\":{\"value\":\"[5 DIGITS]\",\"mode\":\"dtmf\"}}]}"
+		assert builder.text() == """{"tropo":[{"choices":{"value":"[5 DIGITS]","mode":"dtmf"}}]}"""
 	}
 	
 	public void testConference() {
@@ -87,7 +87,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			conference(name : 'foo', id: '1234', mute: false, send_tones: false, exit_tone: '#')
 		}
-		assert builder.text() == "{\"tropo\":[{\"conference\":{\"name\":\"foo\",\"id\":\"1234\",\"mute\":false,\"send_tones\":false,\"exit_tone\":\"#\"}}]}"
+		assert builder.text() == """{"tropo":[{"conference":{"name":"foo","id":"1234","mute":false,"send_tones":false,"exit_tone":"#"}}]}"""
 	}
 
 	public void testConferenceWithOnAndSayBlocks() {
@@ -103,7 +103,7 @@ class TropoBuilderTests extends GroovyTestCase {
 				}
 			}
 		}
-		assert builder.text() == "{\"tropo\":[{\"conference\":{\"name\":\"foo\",\"id\":\"1234\",\"mute\":false,\"send_tones\":false,\"exit_tone\":\"#\",\"on\":[{\"event\":\"join\",\"say\":[{\"value\":\"Welcome to the conference\"}]},{\"event\":\"leave\",\"say\":[{\"value\":\"Someone has left the conference\"}]}]}}]}"
+		assert builder.text() == """{"tropo":[{"conference":{"name":"foo","id":"1234","mute":false,"send_tones":false,"exit_tone":"#","on":[{"event":"join","say":[{"value":"Welcome to the conference"}]},{"event":"leave","say":[{"value":"Someone has left the conference"}]}]}}]}"""
 	}
 		
 	public void testFailsConferenceWithNoNameParameter() {
@@ -134,7 +134,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			hangup()
 		}
-		assert builder.text() == "{\"tropo\":[{\"hangup\":null}]}"
+		assert builder.text() == """{"tropo":[{"hangup":null}]}"""
 	}
 	
 	public void testOn() {
@@ -143,7 +143,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			on(event: 'hangup', next: 'myresource')
 		}
-		assert builder.text() == "{\"tropo\":[{\"on\":{\"event\":\"hangup\",\"next\":\"myresource\"}}]}"
+		assert builder.text() == """{"tropo":[{"on":{"event":"hangup","next":"myresource"}}]}"""
 	}
 	
 	public void testFailsOnWithNoEventParameter() {
@@ -154,16 +154,18 @@ class TropoBuilderTests extends GroovyTestCase {
 				on(foo: 'bar', next: 'myresource')
 			}
 		}
-		assert message == "Missing required property: 'event'"
+		assert message == """Missing required property: 'event'"""
 	}
 	
 	public void testRecord() {
 	
 		def builder = new TropoBuilder()
 		builder.tropo {
-			record(name: 'foo', url: 'http://sendme.com/tropo', beep: true, send_tones: false, exit_tone: '#')
+			record(name: 'foo', url: 'http://sendme.com/tropo', beep: true, send_tones: false) {
+				choices(terminator: '#')
+			}
 		}
-		assert builder.text() == "{\"tropo\":[{\"record\":{\"name\":\"foo\",\"url\":\"http://sendme.com/tropo\",\"beep\":true,\"send_tones\":false,\"exit_tone\":\"#\"}}]}"		
+		assert builder.text() == """{"tropo":[{"record":{"name":"foo","url":"http://sendme.com/tropo","beep":true,"send_tones":false,"choices":{"terminator":"#"}}}]}"""		
 	}
 	
 	public void testFailsRecordWithNoNameParameter() {
@@ -203,9 +205,11 @@ class TropoBuilderTests extends GroovyTestCase {
 		
 		def builder = new TropoBuilder()
 		builder.tropo {
-			record(name: 'foo', url: 'mailto:foo@bar.com', beep: true, send_tones: false, exit_tone: '#')
+			record(name: 'foo', url: 'mailto:foo@bar.com', beep: true, send_tones: false) {
+				choices(terminator:'#')
+			}
 		}
-		assert builder.text() == "{\"tropo\":[{\"record\":{\"name\":\"foo\",\"url\":\"foo@bar.com\",\"beep\":true,\"send_tones\":false,\"exit_tone\":\"#\"}}]}"		
+		assert builder.text() == """{"tropo":[{"record":{"name":"foo","url":"foo@bar.com","beep":true,"send_tones":false,"choices":{"terminator":"#"}}}]}"""		
 	}
 	
 	public void testRedirect() {
@@ -214,7 +218,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			redirect(to: 'sip:1234', from: '4155551212')
 		}
-		assert builder.text() == "{\"tropo\":[{\"redirect\":{\"to\":\"sip:1234\",\"from\":\"4155551212\"}}]}"
+		assert builder.text() == """{"tropo":[{"redirect":{"to":"sip:1234","from":"4155551212"}}]}"""
 	}
 	
 	public void testFailsNestedRedirect() {
@@ -247,7 +251,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			reject()
 		}
-		assert builder.text() == "{\"tropo\":[{\"reject\":null}]}"
+		assert builder.text() == """{"tropo":[{"reject":null}]}"""
 
 	}
 	
@@ -263,7 +267,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		
 		def builder = new TropoBuilder()
 		builder.tropo {}
-		assert builder.text() == "{\"tropo\":[]}"
+		assert builder.text() == """{"tropo":[]}"""
 	}
 	
 	public void testSay() {
@@ -273,7 +277,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			say('1234')
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"1234\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"}]}]}"""
 	}
 	
 	public void testSayWithNumbersAndDobleQuotes() {
@@ -283,7 +287,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			say("Your zipcode is ${14000}. oh yes.")
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Your zipcode is 14000. oh yes.\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"Your zipcode is 14000. oh yes."}]}]}"""
 	}
 	
 	public void testSayWithMapArgument() {
@@ -293,7 +297,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			say(value:'1234')
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"1234\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"}]}]}"""
 	}
 	
 	public void testFailsWithNumbers() {
@@ -315,7 +319,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			say([value: '1234'], [value: 'abcd', event: 'nomatch:1'])
 		}
 		
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"1234\"},{\"value\":\"abcd\",\"event\":\"nomatch:1\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"},{"value":"abcd","event":"nomatch:1"}]}]}"""
 	}
 
 	public void testSayWithMoreThanTwoArrayArguments() {
@@ -325,7 +329,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			say([[value: '1234'], [value: 'abcd', event: 'nomatch:1'], [value: 'zywx', event: 'nomatch:2']])
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"1234\"},{\"value\":\"abcd\",\"event\":\"nomatch:1\"},{\"value\":\"zywx\",\"event\":\"nomatch:2\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"},{"value":"abcd","event":"nomatch:1"},{"value":"zywx","event":"nomatch:2"}]}]}"""
 	}
 
 	public void testFailsWithNoValuePassed() {
@@ -348,7 +352,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			on(event: 'error', next: 'error.json')
 			
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"blah\"}]},{\"on\":{\"event\":\"error\",\"next\":\"error.json\"}}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"blah"}]},{"on":{"event":"error","next":"error.json"}}]}"""
 	}
 	
 	public void testStartRecording() {
@@ -357,7 +361,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			startRecording(url:'http://postrecording.com/tropo')
 		}
-		assert builder.text() == "{\"tropo\":[{\"startRecording\":{\"url\":\"http://postrecording.com/tropo\"}}]}"
+		assert builder.text() == """{"tropo":[{"startRecording":{"url":"http://postrecording.com/tropo"}}]}"""
 	}
 
 	public void testStopRecording() {
@@ -366,7 +370,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			stopRecording()
 		}
-		assert builder.text() == "{\"tropo\":[{\"stopRecording\":null}]}"
+		assert builder.text() == """{"tropo":[{"stopRecording":null}]}"""
 
 	}
 
@@ -376,7 +380,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.tropo {
 			transfer(to: 'tel:+14157044517')
 		}
-		assert builder.text() == "{\"tropo\":[{\"transfer\":{\"to\":\"tel:+14157044517\"}}]}"
+		assert builder.text() == """{"tropo":[{"transfer":{"to":"tel:+14157044517"}}]}"""
 	}
 	
 	public void testTransferWithOnAndChoices() {
@@ -388,7 +392,7 @@ class TropoBuilderTests extends GroovyTestCase {
 				choices(value: '[5 DIGITS]')
 			}
 		}
-		assert builder.text() == "{\"tropo\":[{\"transfer\":{\"to\":\"tel:+14157044517\",\"on\":[{\"event\":\"unbounded\",\"next\":\"/error.json\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+		assert builder.text() == """{"tropo":[{"transfer":{"to":"tel:+14157044517","on":[{"event":"unbounded","next":"/error.json"}],"choices":{"value":"[5 DIGITS]"}}}]}"""
 	}
 	
 	public void testFailsTransferWithNoToParameter() {
@@ -410,13 +414,13 @@ class TropoBuilderTests extends GroovyTestCase {
 			say([value: '1234'], [value: 'abcd', event: 'nomatch:1'])
 			say([value: '0987'], [value: 'zyxw', event: 'nomatch:2'])
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"1234\"},{\"value\":\"abcd\",\"event\":\"nomatch:1\"}]},{\"say\":[{\"value\":\"0987\"},{\"value\":\"zyxw\",\"event\":\"nomatch:2\"}]}]}"		
+		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"},{"value":"abcd","event":"nomatch:1"}]},{"say":[{"value":"0987"},{"value":"zyxw","event":"nomatch:2"}]}]}"""		
 	}
 
 	public void testParseJsonSession() {
 
 		def builder = new TropoBuilder()
-		def json_session = "{\"session\":{\"id\":\"dih06n\",\"accountId\":\"33932\",\"timestamp\":\"2010-01-19T23:18:48.562Z\",\"userType\":\"HUMAN\",\"to\":{\"id\":\"tropomessaging@bot.im\",\"name\":\"unknown\",\"channel\":\"TEXT\",\"network\":\"JABBER\"},\"from\":{\"id\":\"john_doe@gmail.com\",\"name\":\"unknown\",\"channel\":\"TEXT\",\"network\":\"JABBER\"}}}"
+		def json_session = """{"session":{"id":"dih06n","accountId":"33932","timestamp":"2010-01-19T23:18:48.562Z","userType":"HUMAN","to":{"id":"tropomessaging@bot.im","name":"unknown","channel":"TEXT","network":"JABBER"},"from":{"id":"john_doe@gmail.com","name":"unknown","channel":"TEXT","network":"JABBER"}}}"""
 		def map = builder.parse(json_session)
 		def t = map.session.timestamp
 		assert map.session.timestamp == '2010-01-19T23:18:48.562Z'
@@ -442,7 +446,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			say('foo')
 			say('bar')
 		}
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"foo\"}]},{\"say\":[{\"value\":\"bar\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"foo"}]},{"say":[{"value":"bar"}]}]}"""
 	}
 
 	public void testTwoSaysSeparated() {
@@ -451,7 +455,7 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.say('foo')
 		builder.say('bar')
 
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"foo\"}]},{\"say\":[{\"value\":\"bar\"}]}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"foo"}]},{"say":[{"value":"bar"}]}]}"""
 	}
 
 	public void testSayOnAndRecordSeparated() {
@@ -464,23 +468,23 @@ class TropoBuilderTests extends GroovyTestCase {
 			choices(value: '[5 DIGITS]')
 		}
 		
-		assert builder.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Welcome to the app\"}]},{\"on\":{\"event\":\"hangup\",\"next\":\"/hangup.json\"}},{\"record\":{\"name\":\"foo\",\"beep\":true,\"send_tones\":false,\"exit_tone\":\"#\",\"url\":\"http://sendme.com/tropo\",\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+		assert builder.text() == """{"tropo":[{"say":[{"value":"Welcome to the app"}]},{"on":{"event":"hangup","next":"/hangup.json"}},{"record":{"name":"foo","beep":true,"send_tones":false,"exit_tone":"#","url":"http://sendme.com/tropo","say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}}]}"""
 	}
 	
 	public void testReset() {
 		
 		def builder = new TropoBuilder()
 		builder.ask(name : 'foo', bargein: true, timeout: 30, required: true)		
-		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true}}]}"
+		assert builder.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true}}]}"""
 		
 		builder.reset()
-		assert builder.text() == "{\"tropo\":[]}"
+		assert builder.text() == """{"tropo":[]}"""
 	}
 	
 	public void testResultWithActionIsParsed() {
 		
 		def builder = new TropoBuilder()
-		def json_result = "{\"result\":{\"sessionId\":\"CCFD9C86-1DD1-11B2-B76D-B9B253E4B7FB@161.253.55.20\",\"callState\":\"ANSWERED\",\"sessionDuration\":2,\"sequence\":1,\"complete\":true,\"error\":null,\"actions\":{\"name\":\"zip\",\"attempts\":1,\"disposition\":\"SUCCESS\",\"confidence\":100,\"interpretation\":\"12345\",\"utterance\":\"1 2 3 4 5\"}}}"
+		def json_result = """{"result":{"sessionId":"CCFD9C86-1DD1-11B2-B76D-B9B253E4B7FB@161.253.55.20","callState":"ANSWERED","sessionDuration":2,"sequence":1,"complete":true,"error":null,"actions":{"name":"zip","attempts":1,"disposition":"SUCCESS","confidence":100,"interpretation":"12345","utterance":"1 2 3 4 5"}}}"""
 		def map = builder.parse(json_result)
 		
 		assert map.result.actions.name == 'zip'
@@ -489,7 +493,7 @@ class TropoBuilderTests extends GroovyTestCase {
 	public void testObjectArrivesInJson() {
 
 		def builder = new TropoBuilder()
-		def json_result = "{\"result\":{\"sessionId\":\"CCFD9C86-1DD1-11B2-B76D-B9B253E4B7FB@161.253.55.20\",\"callState\":\"ANSWERED\",\"sessionDuration\":2,\"sequence\":1,\"complete\":true,\"error\":null,\"actions\":{\"name\":\"zip\",\"attempts\":1,\"disposition\":\"SUCCESS\",\"confidence\":100,\"interpretation\":\"12345\",\"utterance\":\"1 2 3 4 5\"}}}"
+		def json_result = """{"result":{"sessionId":"CCFD9C86-1DD1-11B2-B76D-B9B253E4B7FB@161.253.55.20","callState":"ANSWERED","sessionDuration":2,"sequence":1,"complete":true,"error":null,"actions":{"name":"zip","attempts":1,"disposition":"SUCCESS","confidence":100,"interpretation":"12345","utterance":"1 2 3 4 5"}}}"""
 		def map = builder.parse(json_result)
 		
 		def a = map.result
@@ -512,14 +516,14 @@ class TropoBuilderTests extends GroovyTestCase {
 		builder.say 'Go ahead, sing-along.'
 		builder.say "http://denalidomain.com/music/keepers/HappyHappyBirthdaytoYou-Disney.mp3"
 	 
-		assert builder.text() == "{\"tropo\":[{\"on\":{\"event\":\"error\",\"next\":\"/error.json\"}},{\"on\":{\"event\":\"hangup\",\"next\":\"/hangup.json\"}},{\"on\":{\"event\":\"continue\",\"next\":\"/next.json\"}},{\"say\":[{\"value\":\"Hello\"}]},{\"startRecording\":{\"url\":\"http://heroku-voip.marksilver.net/post_audio_to_s3?filename=foo.wav&unique_id=bar\"}},{\"say\":[{\"value\":\"You are now on the record.\"}]},{\"say\":[{\"value\":\"Go ahead, sing-along.\"}]},{\"say\":[{\"value\":\"http://denalidomain.com/music/keepers/HappyHappyBirthdaytoYou-Disney.mp3\"}]}]}"
+		assert builder.text() == """{"tropo":[{"on":{"event":"error","next":"/error.json"}},{"on":{"event":"hangup","next":"/hangup.json"}},{"on":{"event":"continue","next":"/next.json"}},{"say":[{"value":"Hello"}]},{"startRecording":{"url":"http://heroku-voip.marksilver.net/post_audio_to_s3?filename=foo.wav&unique_id=bar"}},{"say":[{"value":"You are now on the record."}]},{"say":[{"value":"Go ahead, sing-along."}]},{"say":[{"value":"http://denalidomain.com/music/keepers/HappyHappyBirthdaytoYou-Disney.mp3"}]}]}"""
 	}
 	
 	/*
 	public void testGenerateVoiceSession() {
 		
 		def builder = new TropoBuilder()
-		def json_session = "{\"session\":{\"id\":\"0-13c4-4b563da3-7aecefda-46af-1d10bdd0\",\"accountId\":\"33932\",\"timestamp\":\"2010-01-19T23:18:00.854Z\",\"userType\":\"HUMAN\",\"to\":{\"id\":\"9991427589\",\"name\":\"unknown\",\"channel\":\"VOICE\",\"network\":\"PSTN\"},\"from\":{\"id\":\"jsgoecke\",\"name\":\"unknown\",\"channel\":\"VOICE\",\"network\":\"PSTN\"}}}"
+		def json_session = "{"session":{"id":"0-13c4-4b563da3-7aecefda-46af-1d10bdd0","accountId":"33932","timestamp":"2010-01-19T23:18:00.854Z","userType":"HUMAN","to":{"id":"9991427589","name":"unknown","channel":"VOICE","network":"PSTN"},"from":{"id":"jsgoecke","name":"unknown","channel":"VOICE","network":"PSTN"}}}"
 		def map = builder.parse(json_session)
 		
 		assert builder.voiceSession == true
@@ -529,7 +533,7 @@ class TropoBuilderTests extends GroovyTestCase {
 	public void testGenerateTextSession() {
 		
 		def builder = new TropoBuilder()
-		def json_session = "{\"session\":{\"id\":\"dih06n\",\"accountId\":\"33932\",\"timestamp\":\"2010-01-19T23:18:48.562Z\",\"userType\":\"HUMAN\",\"to\":{\"id\":\"tropomessaging@bot.im\",\"name\":\"unknown\",\"channel\":\"TEXT\",\"network\":\"JABBER\"},\"from\":{\"id\":\"john_doe@gmail.com\",\"name\":\"unknown\",\"channel\":\"TEXT\",\"network\":\"JABBER\"}}}"
+		def json_session = "{"session":{"id":"dih06n","accountId":"33932","timestamp":"2010-01-19T23:18:48.562Z","userType":"HUMAN","to":{"id":"tropomessaging@bot.im","name":"unknown","channel":"TEXT","network":"JABBER"},"from":{"id":"john_doe@gmail.com","name":"unknown","channel":"TEXT","network":"JABBER"}}}"
 		def map = builder.parse(json_session)
 		
 		assert builder.voiceSession == true
@@ -547,7 +551,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			recording(url: 'http://foobar', method: 'POST', format: 'audio/mp3', username: 'jose', password: 'passwd')
 		} 
 
-		assert builder.text() == "{\"tropo\":[{\"call\":{\"to\":\"foo\",\"from\":\"bar\",\"network\":\"SMS\",\"channel\":\"TEXT\",\"timeout\":10,\"answerOnMedia\":false,\"headers\":{\"foo\":\"foo\",\"bar\":\"bar\"},\"recording\":{\"url\":\"http://foobar\",\"method\":\"POST\",\"format\":\"audio/mp3\",\"username\":\"jose\",\"password\":\"passwd\"}}}]}"
+		assert builder.text() == """{"tropo":[{"call":{"to":"foo","from":"bar","network":"SMS","channel":"TEXT","timeout":10,"answerOnMedia":false,"headers":{"foo":"foo","bar":"bar"},"recording":{"url":"http://foobar","method":"POST","format":"audio/mp3","username":"jose","password":"passwd"}}}]}"""
 	}
 	
 	public void testMessage() {
@@ -560,7 +564,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			say('Please say your account number')
 		}
 
-		assert builder.text() == "{\"tropo\":[{\"message\":{\"to\":\"foo\",\"from\":\"bar\",\"network\":\"SMS\",\"channel\":\"TEXT\",\"timeout\":10,\"answerOnMedia\":false,\"headers\":{\"foo\":\"foo\",\"bar\":\"bar\"},\"recording\":{\"url\":\"http://foobar\",\"method\":\"POST\",\"format\":\"audio/mp3\",\"username\":\"jose\",\"password\":\"passwd\"},\"say\":[{\"value\":\"Please say your account number\"}]}}]}"
+		assert builder.text() == """{"tropo":[{"message":{"to":"foo","from":"bar","network":"SMS","channel":"TEXT","timeout":10,"answerOnMedia":false,"headers":{"foo":"foo","bar":"bar"},"recording":{"url":"http://foobar","method":"POST","format":"audio/mp3","username":"jose","password":"passwd"},"say":[{"value":"Please say your account number"}]}}]}"""
 	}
 	
 	public void testRecordWithTranscriptionRequest() {
@@ -573,7 +577,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			choices(value: '[5 DIGITS]')
 		}
 
-		assert builder.text() == "{\"tropo\":[{\"record\":{\"name\":\"foo\",\"url\":\"http://sendme.com/tropo\",\"beep\":true,\"sendTones\":true,\"exitTone\":\"#\",\"transcription\":{\"id\":\"bling\",\"url\":\"mailto:jose@voxeo.com\",\"emailFormat\":\"encoded\"},\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+		assert builder.text() == """{"tropo":[{"record":{"name":"foo","url":"http://sendme.com/tropo","beep":true,"sendTones":true,"exitTone":"#","transcription":{"id":"bling","url":"mailto:jose@voxeo.com","emailFormat":"encoded"},"say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}}]}"""
 	}
 	
 	
@@ -592,7 +596,7 @@ class TropoBuilderTests extends GroovyTestCase {
 
 		}
 
-		assert builder.text() == "{\"tropo\":[{\"ask\":{\"name\":\"donate_to_id\",\"bargein\":true,\"timeout\":10,\"silenceTimeout\":10,\"attempts\":4,\"say\":[{\"event\":\"timeout\",\"value\":\"Sorry, I did not hear anything.\"},{\"event\":\"nomatch:1 nomatch:2 nomatch:3\",\"value\":\"Sorry, that wasn't a valid answer. You can press or say 1 for 'yes', or 2 for 'no'.\"},{\"value\":\"You chose organization foobar. Are you ready to donate to them? If you say no, I will tell you a little more about the organization.\"},{\"event\":\"nomatch:3\",\"value\":\"This is your last attempt.\"}],\"choices\":{\"value\":\"true(1,yes,sure,affirmative), false(2,no,no thank you,negative),0(0,help,i do not know, agent, operator, assistance, representative, real person, human), 9(9,quit,stop,shut up)\"}}}]}"
+		assert builder.text() == """{"tropo":[{"ask":{"name":"donate_to_id","bargein":true,"timeout":10,"silenceTimeout":10,"attempts":4,"say":[{"event":"timeout","value":"Sorry, I did not hear anything."},{"event":"nomatch:1 nomatch:2 nomatch:3","value":"Sorry, that wasn't a valid answer. You can press or say 1 for 'yes', or 2 for 'no'."},{"value":"You chose organization foobar. Are you ready to donate to them? If you say no, I will tell you a little more about the organization."},{"event":"nomatch:3","value":"This is your last attempt."}],"choices":{"value":"true(1,yes,sure,affirmative), false(2,no,no thank you,negative),0(0,help,i do not know, agent, operator, assistance, representative, real person, human), 9(9,quit,stop,shut up)"}}}]}"""
 	}
 	
 	public void testVoice() {
@@ -677,7 +681,7 @@ class TropoBuilderTests extends GroovyTestCase {
 	
 	public void testShouldParseJsonStringsAndMaps() {
 		
-		def json_session = "{\"session\":{\"id\":\"dih06n\",\"accountId\":\"33932\",\"timestamp\":\"2010-01-19T23:18:48.562Z\",\"userType\":\"HUMAN\",\"to\":{\"id\":\"tropomessaging@bot.im\",\"name\":\"unknown\",\"channel\":\"TEXT\",\"network\":\"JABBER\"},\"from\":{\"id\":\"john_doe@gmail.com\",\"name\":\"unknown\",\"channel\":\"TEXT\",\"network\":\"JABBER\"}}}"
+		def json_session = """{"session":{"id":"dih06n","accountId":"33932","timestamp":"2010-01-19T23:18:48.562Z","userType":"HUMAN","to":{"id":"tropomessaging@bot.im","name":"unknown","channel":"TEXT","network":"JABBER"},"from":{"id":"john_doe@gmail.com","name":"unknown","channel":"TEXT","network":"JABBER"}}}"""
 		
 		def map = new TropoBuilder().parse(json_session)
 		assert map.session.userType == 'HUMAN' 
@@ -701,7 +705,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			}
 			append(builder1)
 		}
-		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"on\":{\"event\":\"success\",\"next\":\"/result.json\"}}]}"
+		assert builder2.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}},{"on":{"event":"success","next":"/result.json"}}]}"""
 	}
 	
 	public void testAppendBlockWithMultipleElements() {
@@ -720,7 +724,7 @@ class TropoBuilderTests extends GroovyTestCase {
 			}
 			append(builder1)
 		}
-		assert builder2.text() == "{\"tropo\":[{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}},{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null}]}"
+		assert builder2.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}},{"say":[{"value":"Hello tropo"}]},{"hangup":null}]}"""
 	}
 	
 	public void testAppendBlockStart() {
@@ -739,7 +743,7 @@ class TropoBuilderTests extends GroovyTestCase {
 				choices(value: '[5 DIGITS]')
 			}
 		}
-		assert builder2.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null},{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+		assert builder2.text() == """{"tropo":[{"say":[{"value":"Hello tropo"}]},{"hangup":null},{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}}]}"""
 	}
 	
 	
@@ -760,8 +764,7 @@ class TropoBuilderTests extends GroovyTestCase {
 				choices(value: '[5 DIGITS]')
 			}
 		}
-		println builder2.text()
-		assert builder2.text() == "{\"tropo\":[{\"say\":[{\"value\":\"Whatsup\"}]},{\"say\":[{\"value\":\"Hello tropo\"}]},{\"hangup\":null},{\"ask\":{\"name\":\"foo\",\"bargein\":true,\"timeout\":30,\"required\":true,\"say\":[{\"value\":\"Please say your account number\"}],\"choices\":{\"value\":\"[5 DIGITS]\"}}}]}"
+		assert builder2.text() == """{"tropo":[{"say":[{"value":"Whatsup"}]},{"say":[{"value":"Hello tropo"}]},{"hangup":null},{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"say":[{"value":"Please say your account number"}],"choices":{"value":"[5 DIGITS]"}}}]}"""
 	}
 	
 	public void testIsEmpty() {
