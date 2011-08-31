@@ -11,9 +11,9 @@ class TropoBuilderTests extends GroovyTestCase {
 		
 		def builder = new TropoBuilder()
 		builder.tropo {
-			ask(name : 'foo', bargein: true, timeout: 30, required: true)
+			ask(name : 'foo', bargein: true, timeout: 30, required: true, interdigitTimeout: 5)
 		}
-		assert builder.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true}}]}"""
+		assert builder.text() == """{"tropo":[{"ask":{"name":"foo","bargein":true,"timeout":30,"required":true,"interdigitTimeout":5}}]}"""
 	}
 	
 	public void testAskWithSayBlock() {
@@ -85,9 +85,9 @@ class TropoBuilderTests extends GroovyTestCase {
 		
 		def builder = new TropoBuilder()
 		builder.tropo {
-			conference(name : 'foo', id: '1234', mute: false, send_tones: false, exit_tone: '#')
+			conference(name : 'foo', id: '1234', mute: false, send_tones: false, exit_tone: '#', interdigitTimeout: 5)
 		}
-		assert builder.text() == """{"tropo":[{"conference":{"name":"foo","id":"1234","mute":false,"send_tones":false,"exit_tone":"#"}}]}"""
+		assert builder.text() == """{"tropo":[{"conference":{"name":"foo","id":"1234","mute":false,"send_tones":false,"exit_tone":"#","interdigitTimeout":5}}]}"""
 	}
 
 	public void testConferenceWithOnAndSayBlocks() {
@@ -161,11 +161,11 @@ class TropoBuilderTests extends GroovyTestCase {
 	
 		def builder = new TropoBuilder()
 		builder.tropo {
-			record(name: 'foo', url: 'http://sendme.com/tropo', beep: true, send_tones: false) {
+			record(name: 'foo', url: 'http://sendme.com/tropo', beep: true, send_tones: false, interdigitTimeout: 5) {
 				choices(terminator: '#')
 			}
 		}
-		assert builder.text() == """{"tropo":[{"record":{"name":"foo","url":"http://sendme.com/tropo","beep":true,"send_tones":false,"choices":{"terminator":"#"}}}]}"""		
+		assert builder.text() == """{"tropo":[{"record":{"name":"foo","url":"http://sendme.com/tropo","beep":true,"send_tones":false,"interdigitTimeout":5,"choices":{"terminator":"#"}}}]}"""		
 	}
 	
 	public void testFailsRecordWithNoNameParameter() {
