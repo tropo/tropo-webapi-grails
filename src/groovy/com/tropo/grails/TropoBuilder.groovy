@@ -282,6 +282,11 @@ class TropoBuilder extends BuilderSupport {
 		value = cleanGStrings(value)
 		
 		if (name == "say") {
+			if (value instanceof Object[]) {
+				def list = new ArrayList()
+				value.each { list << it }
+				value = list
+			}
 			if (!(value instanceof String) && !(value instanceof Map) && !(value instanceof List)) {
 				throw new TropoBuilderException("An invalid paramater type ${value.getClass()} has been passed")
 			}
@@ -345,7 +350,12 @@ class TropoBuilder extends BuilderSupport {
 
 		if (!root) {
 			reset()
-		}
+		}/*
+		if (arg0.equals("say") && arg2 instanceof Object[] && arg2.length > 1) {
+			def list = new ArrayList()
+			list << arg2
+			arg2 = list
+		}*/
 		return super.doInvokeMethod(arg0, arg1, arg2);
 	}
 

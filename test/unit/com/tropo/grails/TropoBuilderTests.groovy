@@ -321,7 +321,17 @@ class TropoBuilderTests extends GroovyTestCase {
 		
 		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"},{"value":"abcd","event":"nomatch:1"}]}]}"""
 	}
-
+	
+	public void testSayWithArrayArgument2() {
+		
+		def builder = new TropoBuilder()
+		builder.tropo {
+			say([[value: '1234'], [value: 'abcd', event: 'nomatch:1'],[value: '1234', event: 'timeout:1'],[value: '1234', event: 'timeout:2']])
+		}
+		println builder.text()
+		assert builder.text() == """{"tropo":[{"say":[{"value":"1234"},{"value":"abcd","event":"nomatch:1"},{"value":"1234","event":"timeout:1"},{"value":"1234","event":"timeout:2"}]}]}"""
+	}
+	
 	public void testSayWithMoreThanTwoArrayArguments() {
 		
 		def builder = new TropoBuilder()
