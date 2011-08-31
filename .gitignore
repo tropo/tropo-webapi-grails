@@ -2,3 +2,5 @@
 /target
 /grails-tropo-webapi-grails-0.1.zip
 /trunk
+/.link_to_grails_plugins
+/.settings
