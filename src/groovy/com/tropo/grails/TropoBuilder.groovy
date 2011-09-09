@@ -116,12 +116,12 @@ class TropoBuilder extends BuilderSupport {
 			} else if (name == "on") {
 				// it looks like "on" uses an array only if nested
 				if (stack.peek() == root.tropo) {
-					created = buildElement(name,map)
+					created = internalBuildElement(name,map)
 				} else {
 					created = buildArray(name,map)
 				}
 			} else {
-				created = buildElement(name,map)
+				created = internalBuildElement(name,map)
 			}
 			return created;
 		} catch (TropoBuilderException tbe) {
@@ -131,7 +131,7 @@ class TropoBuilder extends BuilderSupport {
 		}
 	}
 	
-	private JSONObject buildElement(String name, Map map) {
+	private JSONObject internalBuildElement(String name, Map map) {
 		
 		//println "I would now insert node ${name} in stack element ${stack.peek()}"
 		map = cleanGStrings(map)
