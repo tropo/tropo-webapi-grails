@@ -115,7 +115,8 @@ class HTTPHelper {
             }
         }
 
-        if (!(result instanceof JSONArray)) {
+        // Handle the failure condition
+        if (result instanceof Map) {
             result.put "requestParams", params
             if (result.href) {
                 populateExtraMapFields('appId', 'applications', result)
