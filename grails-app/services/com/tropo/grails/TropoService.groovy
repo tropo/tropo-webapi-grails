@@ -1,8 +1,7 @@
 package com.tropo.grails
 
-import java.util.Map
+import grails.util.Holders
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 /**
  * This Grails service abstracts the access to the <a href="https://www.tropo.com/docs/rest/rest_api.htm">Tropo REST API</a>.</p> 
@@ -20,25 +19,25 @@ class TropoService {
 	private String username
 	private String password
 	
-	private String HARDCODED_BASE_URL = "https://api.tropo.com/v1/"
+	private String HARDCODED_BASE_URL = "https://api.tropo.com/1.0/"
 
 	public TropoService(String username, String password) {
 		
 		this.username = username
 		this.password = password
-		
-		baseUrl = ConfigurationHolder?.config?.tropo?.api?.url
+
+        baseUrl = Holders.config?.tropo?.api?.url  //ConfigurationHolder?.config?.tropo?.api?.url
 		if (!baseUrl) {
 			baseUrl = HARDCODED_BASE_URL
 		}
 		
 		if (!username) {
 			// try to find it on grails config file
-			username = ConfigurationHolder?.config?.tropo?.username
+			username = Holders.config?.tropo?.username    //ConfigurationHolder?.config?.tropo?.username
 		}
 		if (!password) {
 			// try to find it on grails config file
-			username = ConfigurationHolder?.config?.tropo?.password
+			username = Holders.config?.tropo?.password    //ConfigurationHolder?.config?.tropo?.password
 		}
 
 		httpHelper = new HTTPHelper(username,password)

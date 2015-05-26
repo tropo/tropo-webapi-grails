@@ -1,6 +1,16 @@
-/target
-/target
-/grails-tropo-webapi-grails-0.1.zip
-/trunk
-/.link_to_grails_plugins
-/.settings
+# ignore all directories and files in a directory.
+
+# Intellij Idea
+*.iws
+*.iml
+.idea
+out
+
+# Grails
+/logs
+/plugins
+/web-app/plugins
+/web-app/WEB-INF/classes
+stacktrace.log
+target
+.settings
